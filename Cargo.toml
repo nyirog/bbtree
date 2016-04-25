@@ -1,0 +1,6 @@
+[package]
+name = "bbtree"
+version = "0.1.0"
+authors = ["Nyiro Gergo <gergo.nyiro@balabit.com>"]
+
+[dependencies]
