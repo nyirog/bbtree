@@ -18,16 +18,10 @@ impl Node {
                 Some(self.value)
             },
             Less => {
-                match self.left {
-                    None => None,
-                    Some(ref left) => left.get(key),
-                }
+                self.left.as_ref().map_or(None, |left|left.get(key))
             },
             Greater => {
-                match self.right {
-                    None => None,
-                    Some(ref right) => right.get(key),
-                }
+                self.right.as_ref().map_or(None, |right|right.get(key))
             }
         }
     }
