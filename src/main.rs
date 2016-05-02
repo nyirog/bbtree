@@ -26,6 +26,34 @@ impl Node {
         }
     }
 
+    pub fn get_ref(&self, key: i32) -> Option<&i32> {
+        match key.cmp(&self.key) {
+            Equal => {
+                Some(&self.value)
+            },
+            Less => {
+                self.left.as_ref().map_or(None, |left|left.get_ref(key))
+            },
+            Greater => {
+                self.right.as_ref().map_or(None, |right|right.get_ref(key))
+            }
+        }
+    }
+
+//    pub fn get_mut(&self, key: i32) -> Option<&mut i32> {
+//        match key.cmp(&self.key) {
+//            Equal => {
+//                Some(&mut *self.value)
+//            },
+//            Less => {
+//                self.left.as_ref().map_or(None, |left|left.get_mut(key))
+//            },
+//            Greater => {
+//                self.right.as_ref().map_or(None, |right|right.get_mut(key))
+//            }
+//        }
+//    }
+
     pub fn insert(&mut self, key: i32, value: i32) {
         match key.cmp(&self.key) {
             Equal => {
@@ -71,6 +99,13 @@ impl BinTree {
         }
     }
 
+    pub fn get_ref(&self, key: i32) -> Option<&i32> {
+        match self.root {
+            None => None,
+            Some(ref node) => node.get_ref(key),
+        }
+    }
+
     pub fn insert(&mut self, key: i32, value: i32) {
         match self.root {
             None => {
@@ -85,6 +120,45 @@ impl BinTree {
 fn test_get_none() {
     let tree = BinTree::new();
     assert_eq!(tree.get(42), None);
+}
+
+
+#[test]
+fn test_tree_get_ref_returns_none_for_unknown_key() {
+    let tree = BinTree::new();
+    assert_eq!(tree.get_ref(42), None);
+}
+
+#[test]
+fn test_tree_get_ref_returns_a_reference() {
+    let value: i32 = 56;
+    let mut tree = BinTree::new();
+
+    tree.insert(42, value);
+
+    assert_eq!(tree.get_ref(42), Some(&value));
+}
+
+#[test]
+fn test_tree_get_ref_for_the_bigger_sub_tree() {
+    let value: i32 = 56;
+    let mut tree = BinTree::new();
+
+    tree.insert(42, 21);
+    tree.insert(66, value);
+
+    assert_eq!(tree.get_ref(66), Some(&value));
+}
+
+#[test]
+fn test_tree_get_ref_for_the_smaller_sub_tree() {
+    let value: i32 = 56;
+    let mut tree = BinTree::new();
+
+    tree.insert(42, 21);
+    tree.insert(33, value);
+
+    assert_eq!(tree.get_ref(33), Some(&value));
 }
 
 #[test]
@@ -111,6 +185,57 @@ fn test_insert_bigger() {
     assert_eq!(tree.get(42), Some(56));
     assert_eq!(tree.get(111), Some(222));
 }
+
+#[test]
+fn test_node_get_ref_returns_node_for_unknoen_key() {
+    let value: i32 = 56;
+    let node = Node::new(42, value);
+
+    assert_eq!(node.get_ref(36), None);
+}
+
+#[test]
+fn test_node_get_ref_returns_a_reference() {
+    let value: i32 = 56;
+    let node = Node::new(42, value);
+
+    assert_eq!(node.get_ref(42), Some(&value));
+}
+
+#[test]
+fn test_node_get_ref_for_the_bigger_sub_node() {
+    let value: i32 = 56;
+    let mut node = Node::new(42, 20);
+
+    node.insert(66, value);
+
+    assert_eq!(node.get_ref(66), Some(&value));
+}
+
+#[test]
+fn test_node_get_ref_for_the_smaller_sub_node() {
+    let value: i32 = 56;
+    let mut node = Node::new(42, 20);
+
+    node.insert(33, value);
+
+    assert_eq!(node.get_ref(33), Some(&value));
+}
+
+// #[test]
+// fn test_get_mut_returns_onne_for_unknown_key() {
+//     let node = Node::new(42, 21);
+// 
+//     assert_eq!(node.get_mut(21), None);
+// }
+
+// #[test]
+// fn test_node_get_mut() {
+//     let mut value: i32 = 56;
+//     let node = Node::new(42, 20);
+// 
+//     assert_eq!(node.get_mut(33), Some(&mut value));
+// }
 
 
 fn main() {
